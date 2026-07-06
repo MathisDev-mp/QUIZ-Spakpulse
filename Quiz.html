@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="fr" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz - Sparpulse</title>
+  <link rel="stylesheet" href="lo.css">
+  <link rel="stylesheet" href="quiz-style.css"> <!-- CSS spécifique au quiz -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="quiz-container">
+    <!-- Header avec retour et infos quiz -->
+    <header class="quiz-header">
+      <a href="Acceuil.html">
+      <button class="back-btn" aria-label="Retour à l'accueil">
+        ← Retour
+      </button>
+      </a>
+      <h1 class="quiz-title">Quiz Sparpulse</h1>
+      <button class="theme-toggle" aria-label="Changer de thème">
+        <span class="theme-icon sun">☀️</span>
+        <span class="theme-icon moon">🌙</span>
+      </button>
+    </header>
+
+    <!-- Contenu principal du quiz -->
+    <main class="quiz-main">
+      <!-- Barre de progression + chrono -->
+      <div class="quiz-progress">
+        <div class="timer-container">
+          <div class="timer-icon">⏰</div>
+          <div class="timer" id="timer">01:30</div>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-text">Question <span id="current-question">1</span>/<span id="total-questions">10</span></div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+        </div>
+        <div class="score-display">
+          <span class="score-icon">🏆</span>
+          <span class="score-value" id="score">0 pts</span>
+        </div>
+      </div>
+
+      <!-- Carte de question -->
+      <div class="question-card" id="question-card">
+        <div class="question-category" id="question-category">Thème : Technologie</div>
+        <h2 class="question-text" id="question-text">Quel est le langage le plus utilisé en IA en 2026 ?</h2>
+
+        <div class="options-container" id="options-container">
+          <button class="option-btn" data-index="0">
+            <span class="option-letter">A</span>
+            <span class="option-text">Java</span>
+          </button>
+          <button class="option-btn" data-index="1">
+            <span class="option-letter">B</span>
+            <span class="option-text">Python</span>
+          </button>
+          <button class="option-btn" data-index="2">
+            <span class="option-letter">C</span>
+            <span class="option-text">C++</span>
+          </button>
+          <button class="option-btn" data-index="3">
+            <span class="option-letter">D</span>
+            <span class="option-text">JavaScript</span>
+          </button>
+        </div>
+
+        <button class="validate-btn" id="validate-btn" disabled>
+          Valider la réponse
+        </button>
+
+        <!-- Feedback (caché par défaut) -->
+        <div class="feedback" id="feedback">
+          <div class="feedback-icon" id="feedback-icon">✅</div>
+          <div class="feedback-text" id="feedback-text">Bonne réponse !</div>
+        </div>
+
+        <!-- Explication (optionnelle) -->
+        <div class="explanation" id="explanation">
+          <p><strong>Explication :</strong> <span id="explanation-text">Python domine grâce à ses bibliothèques comme TensorFlow et PyTorch.</span></p>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bouton pour passer à la question suivante (apparaît après validation) -->
+    <button class="next-btn" id="next-btn" style="display: none;">
+      Question suivante →
+    </button>
+  </div>
+
+  <!-- Script pour le quiz et le thème -->
+  <script>
+    // ===== GESTION DU THÈME =====
+    const themeToggle = document.querySelector('.theme-toggle');
+    const body = document.body;
+
+    // Charger le thème sauvegardé
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    body.classList = savedTheme;
+
+    // Mettre à jour l'icône du toggle
+    updateThemeIcon(savedTheme);
+
+    // Écouter le clic sur le toggle
+    themeToggle.addEventListener('click', () => {
+      const newTheme = body.classList.contains('light') ? 'dark' : 'light';
+      body.classList = newTheme;
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon(newTheme);
+    });
+
+    function updateThemeIcon(theme) {
+      const sunIcon = themeToggle.querySelector('.sun');
+      const moonIcon = themeToggle.querySelector('.moon');
+      if (theme === 'dark') {
+        sunIcon.style.display = 'inline';
+        moonIcon.style.display = 'none';
+      } else {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'inline';
+      }
+    }
+
+    // ===== DONNÉES DU QUIZ =====
+    const quizData = [
+      {
+        category: "Technologie",
+        question: "Quel est le langage le plus utilisé en IA en 2026 ?",
+        options: ["Java", "Python", "C++", "JavaScript"],
+        correctAnswer: 1, // Index de la bonne réponse (1 = "Python")
+        explanation: "Python domine grâce à ses bibliothèques comme TensorFlow et PyTorch."
+      },
+      {
+        category: "Science",
+        question: "Quelle est la formule chimique de l'eau ?",
+        options: ["H2O", "CO2", "O2", "NaCl"],
+        correctAnswer: 0,
+        explanation: "L'eau est composée de 2 atomes d'hydrogène (H) et 1 atome d'oxygène (O)."
+      },
+      {
+        category: "Histoire",
+        question: "En quelle année a eu lieu la Révolution française ?",
+        options: ["1789", "1492", "1848", "1917"],
+        correctAnswer: 0,
+        explanation: "La Révolution française a commencé en 1789 avec la prise de la Bastille."
+      },
+      {
+        category: "Cinéma",
+        question: "Quel film a remporté l'Oscar du meilleur film en 2023 ?",
+        options: ["Everything Everywhere All at Once", "The Banshees of Inisherin", "Top Gun: Maverick", "Elvis"],
+        correctAnswer: 0,
+        explanation: "Everything Everywhere All at Once a remporté 7 Oscars en 2023."
+      },
+      {
+        category: "Technologie",
+        question: "Qui a fondé Microsoft ?",
+        options: ["Steve Jobs", "Bill Gates", "Mark Zuckerberg", "Elon Musk"],
+        correctAnswer: 1,
+        explanation: "Bill Gates a cofondé Microsoft avec Paul Allen en 1975."
+      },
+      {
+        category: "Science",
+        question: "Quelle planète est connue comme la 'planète rouge' ?",
+        options: ["Vénus", "Mars", "Jupiter", "Saturne"],
+        correctAnswer: 1,
+        explanation: "Mars est appelée la planète rouge en raison de son apparence rouilleuse."
+      },
+      {
+        category: "Histoire",
+        question: "Quel empereur romain a construit un mur en Angleterre ?",
+        options: ["Jules César", "Auguste", "Hadrien", "Néron"],
+        correctAnswer: 2,
+        explanation: "Le mur d'Hadrien a été construit sous son règne pour marquer la frontière nord de l'Empire romain."
+      },
+      {
+        category: "Cinéma",
+        question: "Quel acteur incarne Tony Stark dans les films Marvel ?",
+        options: ["Chris Evans", "Robert Downey Jr.", "Chris Hemsworth", "Mark Ruffalo"],
+        correctAnswer: 1,
+        explanation: "Robert Downey Jr. a joué Tony Stark (Iron Man) dans 10 films Marvel."
+      },
+      {
+        category: "Technologie",
+        question: "Quel est le premier réseau social créé ?",
+        options: ["Facebook", "Twitter", "Six Degrees", "MySpace"],
+        correctAnswer: 2,
+        explanation: "Six Degrees, lancé en 1997, est considéré comme le premier réseau social moderne."
+      },
+      {
+        category: "Science",
+        question: "Quelle est la vitesse de la lumière (en km/s) ?",
+        options: ["300 000", "150 000", "500 000", "1 000 000"],
+        correctAnswer: 0,
+        explanation: "La vitesse de la lumière dans le vide est d'environ 299 792 km/s, arrondie à 300 000 km/s."
+      }
+    ];
+
+    // ===== VARIABLES GLOBALES =====
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timeLeft = 90; // 90 secondes par question
+    let timerInterval;
+    let selectedAnswer = null;
+
+    // ===== ÉLÉMENTS DOM =====
+    const currentQuestionEl = document.getElementById('current-question');
+    const totalQuestionsEl = document.getElementById('total-questions');
+    const questionCategoryEl = document.getElementById('question-category');
+    const questionTextEl = document.getElementById('question-text');
+    const optionsContainerEl = document.getElementById('options-container');
+    const validateBtn = document.getElementById('validate-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const timerEl = document.getElementById('timer');
+    const progressFillEl = document.getElementById('progress-fill');
+    const scoreEl = document.getElementById('score');
+    const feedbackEl = document.getElementById('feedback');
+    const feedbackIconEl = document.getElementById('feedback-icon');
+    const feedbackTextEl = document.getElementById('feedback-text');
+    const explanationEl = document.getElementById('explanation');
+    const explanationTextEl = document.getElementById('explanation-text');
+    const backBtn = document.querySelector('.back-btn');
+
+    // ===== INITIALISATION DU QUIZ =====
+    function initQuiz() {
+      currentQuestionIndex = 0;
+      score = 0;
+      selectedAnswer = null;
+      updateQuestion();
+      updateScore();
+      startTimer();
+      resetFeedback();
+      nextBtn.style.display = 'none';
+      validateBtn.disabled = true;
+    }
+
+    // ===== MISE À JOUR DE LA QUESTION =====
+    function updateQuestion() {
+      const question = quizData[currentQuestionIndex];
+      questionCategoryEl.textContent = `Thème : ${question.category}`;
+      questionTextEl.textContent = question.question;
+      currentQuestionEl.textContent = currentQuestionIndex + 1;
+      totalQuestionsEl.textContent = quizData.length;
+
+      // Mettre à jour les options
+      optionsContainerEl.innerHTML = '';
+      question.options.forEach((option, index) => {
+        const optionBtn = document.createElement('button');
+        optionBtn.className = 'option-btn';
+        optionBtn.dataset.index = index;
+        optionBtn.innerHTML = `
+          <span class="option-letter">${String.fromCharCode(65 + index)}</span>
+          <span class="option-text">${option}</span>
+        `;
+        optionBtn.addEventListener('click', () => selectOption(index));
+        optionsContainerEl.appendChild(optionBtn);
+      });
+
+      // Réinitialiser la sélection
+      selectedAnswer = null;
+      validateBtn.disabled = true;
+      resetOptionsStyle();
+      resetTimer();
+    }
+
+    // ===== SÉLECTION D'UNE OPTION =====
+    function selectOption(index) {
+      // Réinitialiser les styles des autres options
+      document.querySelectorAll('.option-btn').forEach(btn => {
+        btn.classList.remove('selected', 'correct', 'wrong');
+      });
+
+      // Appliquer le style "sélectionné" à l'option cliquée
+      const selectedBtn = document.querySelector(`.option-btn[data-index="${index}"]`);
+      selectedBtn.classList.add('selected');
+      selectedAnswer = index;
+      validateBtn.disabled = false;
+    }
+
+    // ===== VALIDATION DE LA RÉPONSE =====
+    function validateAnswer() {
+      if (selectedAnswer === null) return;
+
+      const question = quizData[currentQuestionIndex];
+      const isCorrect = selectedAnswer === question.correctAnswer;
+
+      // Mettre à jour le score
+      if (isCorrect) {
+        score += 50; // 50 points par bonne réponse
+        updateScore();
+      }
+
+      // Afficher le feedback
+      showFeedback(isCorrect);
+
+      // Mettre à jour les styles des options
+      document.querySelectorAll('.option-btn').forEach((btn, index) => {
+        if (index === question.correctAnswer) {
+          btn.classList.add('correct');
+        } else if (index === selectedAnswer) {
+          btn.classList.add('wrong');
+        }
+        btn.disabled = true;
+      });
+
+      // Désactiver le bouton valider
+      validateBtn.disabled = true;
+
+      // Afficher le bouton "Question suivante"
+      nextBtn.style.display = 'block';
+
+      // Arrêter le timer
+      clearInterval(timerInterval);
+    }
+
+    // ===== AFFICHER LE FEEDBACK =====
+    function showFeedback(isCorrect) {
+      feedbackEl.style.display = 'flex';
+      explanationEl.style.display = 'block';
+      explanationTextEl.textContent = quizData[currentQuestionIndex].explanation;
+
+      if (isCorrect) {
+        feedbackIconEl.textContent = '✅';
+        feedbackTextEl.textContent = 'Bonne réponse ! +50 pts';
+        feedbackEl.classList.add('correct-feedback');
+        feedbackEl.classList.remove('wrong-feedback');
+      } else {
+        feedbackIconEl.textContent = '❌';
+        feedbackTextEl.textContent = 'Mauvaise réponse !';
+        feedbackEl.classList.add('wrong-feedback');
+        feedbackEl.classList.remove('correct-feedback');
+      }
+    }
+
+    // ===== RESET DU FEEDBACK =====
+    function resetFeedback() {
+      feedbackEl.style.display = 'none';
+      explanationEl.style.display = 'none';
+      feedbackEl.classList.remove('correct-feedback', 'wrong-feedback');
+    }
+
+    // ===== RESET DES STYLES DES OPTIONS =====
+    function resetOptionsStyle() {
+      document.querySelectorAll('.option-btn').forEach(btn => {
+        btn.classList.remove('selected', 'correct', 'wrong');
+        btn.disabled = false;
+      });
+    }
+
+    // ===== MISE À JOUR DU SCORE =====
+    function updateScore() {
+      scoreEl.textContent = `${score} pts`;
+    }
+
+    // ===== CHRONOMÈTRE =====
+    function startTimer() {
+      clearInterval(timerInterval);
+      timeLeft = 90;
+      updateTimerDisplay();
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        updateProgressBar();
+
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          // Si le temps est écoulé, valider automatiquement (réponse incorrecte)
+          selectedAnswer = -1; // Réponse incorrecte par défaut
+          validateAnswer();
+        }
+      }, 1000);
+    }
+
+    function resetTimer() {
+      timeLeft = 90;
+      updateTimerDisplay();
+      updateProgressBar();
+    }
+
+    function updateTimerDisplay() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    // ===== BARRE DE PROGRESSION =====
+    function updateProgressBar() {
+      const progressPercentage = ((currentQuestionIndex + (90 - timeLeft) / 90) / quizData.length) * 100;
+      progressFillEl.style.width = `${progressPercentage}%`;
+
+      // Changer la couleur si le temps est critique
+      if (timeLeft <= 10) {
+        progressFillEl.style.backgroundColor = 'var(--danger-color)';
+      } else if (timeLeft <= 30) {
+        progressFillEl.style.backgroundColor = 'var(--warning-color)';
+      } else {
+        progressFillEl.style.backgroundColor = 'var(--accent-light)';
+        if (body.classList.contains('dark')) {
+          progressFillEl.style.backgroundColor = 'var(--accent-dark)';
+        }
+      }
+    }
+
+    // ===== QUESTION SUIVANTE =====
+    function nextQuestion() {
+      currentQuestionIndex++;
+
+      if (currentQuestionIndex < quizData.length) {
+        updateQuestion();
+        nextBtn.style.display = 'none';
+        resetFeedback();
+        startTimer();
+      } else {
+        // Quiz terminé ! Rediriger vers la page de résultats
+        window.location.href = `results.html?score=${score}&total=${quizData.length}`;
+      }
+    }
+
+    // ===== ÉCOUTEURS D'ÉVÉNEMENTS =====
+    validateBtn.addEventListener('click', validateAnswer);
+    nextBtn.addEventListener('click', nextQuestion);
+    backBtn.addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+
+    // ===== DÉMARRER LE QUIZ =====
+    initQuiz();
+  </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat de la Ligue - SPARKPULSE</title>
+   <link rel="stylesheet" href="ch.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  </head>
+<body>
+  <div class="card">
+    <h3>💬 Chat de la Ligue (Direct)</h3>
+    <div class="chat-container">
+      <div class="chat-messages" id="chatMsgs">
+        <div class="msg other"><strong>Armel :</strong> Hello!!</div>
+        <div class="msg other"><strong>Christelle :</strong> Bonjour </div>
+        <div class="msg me">Moi : Comment aller vous</div>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" id="chatInput" placeholder="Écris à la ligue…" onkeydown="if(event.key==='Enter') sendMessage()">
+        <button class="btn-primary" onclick="sendMessage()">Envoyer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Intégration du script JavaScript -->
+  <script src="chat_ligue.js"></script>
+</body>
+</html>
