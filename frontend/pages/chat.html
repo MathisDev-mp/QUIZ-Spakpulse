@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat de la Ligue - SPARKPULSE</title>
+  <link rel="stylesheet" href="../css/ch.css">
+  <link rel="stylesheet" href="../css/lo.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="card">
+    <h3>💬 Chat de la Ligue (Direct)</h3>
+
+    <!-- Sélecteur de ligue -->
+    <div class="league-selector">
+      <select id="leagueSelect">
+        <option value="">-- Sélectionner une ligue --</option>
+      </select>
+      <button id="refreshLeagueBtn" class="btn-corail">↻</button>
+    </div>
+
+    <div class="chat-container">
+      <div class="chat-messages" id="chatMsgs">
+        <!-- Messages chargés dynamiquement -->
+      </div>
+      <div class="chat-input-area">
+        <input
+          type="text"
+          id="chatInput"
+          placeholder="Écris à la ligue…"
+          onkeydown="if(event.key==='Enter') sendMessage()"
+        >
+        <button class="btn-corail" onclick="sendMessage()">Envoyer</button>
+      </div>
+    </div>
+
+    <!-- Liste des membres connectés -->
+    <div class="online-members">
+      <h4>👥 Membres en ligne :</h4>
+      <div id="onlineMembersList"></div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="../js/chat_ligue.js"></script>
+</body>
+</html>

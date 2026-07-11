@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sparkpulse | L'interaction à vif</title>
+  <link rel="stylesheet" href="..\css\lo.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <!-- Header avec logo et toggle thème -->
+    <header class="header">
+      <div class="logo">
+        <img src="..\assets\logo.png" alt="Logo Sparpulse" class="logo-img">
+        <h1 class="logo-text">Sparpulse</h1>
+      </div>
+      <div class="slogan">L'interaction à vif</div>
+      <button class="theme-toggle" aria-label="Changer de thème">
+        <span class="theme-icon sun">☀️</span>
+        <span class="theme-icon moon">🌙</span>
+      </button>
+    </header>
+
+    <!-- Section principale -->
+    <main class="main-content">
+      <!-- Bouton Jouer -->
+      <section class="cta-section">
+        <a href="Quiz.html">
+        <button class="btn-primary">Jouer maintenant</button>
+        </a>
+        <a href="chat.html">
+         <button class="btn-primary">Accéder à la ligue</button>
+        </a> 
+        </a>
+      </section>
+
+      <!-- Meilleur score -->
+      <section class="best-scores">
+        <h2 class="section-title">🏆 Meilleur score</h2>
+        <div class="scores-list" id="topScores">
+          <!-- Chargé dynamiquement via leaderboard.js -->
+          <div class="score-item">
+            <span class="rank">1</span>
+            <span class="player-name">Chargement...</span>
+            <span class="player-score">0%</span>
+          </div>
+        </div>
+      </section>
+
+       <!-- Thèmes disponibles -->
+      <section class="themes-section">
+        <h2 class="section-title">🎯 Thèmes disponibles</h2>
+        <div class="themes-grid" id="themesGrid">
+          <!-- Chargé dynamiquement via quiz.js -->
+        </div>
+      </section>
+      <!-- Mes ligues (si connecté) -->
+      <section class="leagues-section" id="leaguesSection" style="display: none;">
+        <h2 class="section-title">👥 Mes ligues</h2>
+        <div class="leagues-grid" id="leaguesGrid"></div>
+        <button id="createLeagueBtn" class="btn-primary">Créer une ligue</button>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>© 2026 Sparpulse. Tous droits réservés.</p>
+    </footer>
+  </div>
+   <script type="module" src="../js/auth.js"></script>
+  <script type="module" src="../js/leaderboards.js"></script>
+  <script type="module" src="../js/leagues.js"></script>
+  <script type="module" src="../js/quiz.js"></script>
+
+
+  <!-- Script pour le toggle thème -->
+  <script>
+     const themeToggle = document.querySelector('.theme-toggle');
+    const body = document.body;
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    body.classList = savedTheme;
+    updateThemeIcon(savedTheme);
+
+    themeToggle.addEventListener('click', () => {
+      const newTheme = body.classList.contains('light') ? 'dark' : 'light';
+      body.classList = newTheme;
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon(newTheme);
+    });
+
+    function updateThemeIcon(theme) {
+      const sunIcon = themeToggle.querySelector('.sun');
+      const moonIcon = themeToggle.querySelector('.moon');
+      if (theme === 'dark') {
+        sunIcon.style.display = 'inline';
+        moonIcon.style.display = 'none';
+      } else {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'inline';
+      }
+    }
+  </script>
+</body>
+</html>

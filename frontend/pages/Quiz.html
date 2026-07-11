@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz - Sparkpulse</title>
+  <link rel="stylesheet" href="../css/lo.css">
+  <link rel="stylesheet" href="../css/Quiz-style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="quiz-container">
+    <!-- Header -->
+    <header class="quiz-header">
+      <a href="Acceuil.html">
+        <button class="back-btn" aria-label="Retour à l'accueil">← Retour</button>
+      </a>
+      <h1 class="quiz-title">Quiz Sparpulse</h1>
+      <button class="theme-toggle" aria-label="Changer de thème">
+        <span class="theme-icon sun">☀️</span>
+        <span class="theme-icon moon">🌙</span>
+      </button>
+    </header>
+
+    <!-- Contenu principal -->
+    <main class="quiz-main">
+      <!-- Barre de progression + chrono -->
+      <div class="quiz-progress">
+        <div class="timer-container">
+          <div class="timer-icon">⏰</div>
+          <div class="timer" id="timer">01:30</div>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-text">
+            Question <span id="current-question">1</span>/<span id="total-questions">10</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+        </div>
+        <div class="score-display">
+          <span class="score-icon">🏆</span>
+          <span class="score-value" id="score">0 pts</span>
+        </div>
+      </div>
+
+      <!-- Sélecteur de difficulté (nouveau) -->
+      <div class="difficulty-selector" id="difficultySelector">
+        <h3>Choisis une difficulté :</h3>
+        <div class="difficulty-buttons">
+          <button class="difficulty-btn" data-difficulty="Facile">🟢 Facile</button>
+          <button class="difficulty-btn" data-difficulty="Moyenne">🟡 Moyenne</button>
+          <button class="difficulty-btn" data-difficulty="Difficile">🔴 Difficile</button>
+        </div>
+      </div>
+
+      <!-- Carte de question -->
+      <div class="question-card" id="question-card" style="display: none;">
+        <div class="question-category" id="question-category">Thème : Technologie</div>
+        <h2 class="question-text" id="question-text">Quel est le langage le plus utilisé en IA en 2026 ?</h2>
+        <div class="options-container" id="options-container"></div>
+        <button class="validate-btn" id="validate-btn" disabled>Valider la réponse</button>
+        <div class="feedback" id="feedback">
+          <div class="feedback-icon" id="feedback-icon">✅</div>
+          <div class="feedback-text" id="feedback-text">Bonne réponse !</div>
+        </div>
+        <div class="explanation" id="explanation">
+          <p><strong>Explication :</strong> <span id="explanation-text"></span></p>
+        </div>
+      </div>
+    </main>
+         <!-- Bouton pour passer à la question suivante -->
+    <button class="next-btn" id="next-btn" style="display: none;">Question suivante →</button>
+  </div>
+
+  <!-- Sons pour le feedback -->
+  <audio id="correctSound" src="../assets/sounds/correct.mp3"></audio>
+  <audio id="wrongSound" src="../assets/sounds/wrong.mp3"></audio>
+
+  <!-- Scripts -->
+  <script type="module" src="../js/quiz.js"></script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Résultats - Sparkpulse</title>
+  <link rel="stylesheet" href="../css/lo.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    .results-container {
+      max-width: 600px;
+      margin: 2rem auto;
+      text-align: center;
+      padding: 2rem;
+      background-color: var(--card-bg-light, #FFFFFF);
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    body.dark .results-container {
+      background-color: var(--card-bg-dark, #3A283E);
+    }
+    .results-title {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: var(--text-primary-light, #2D2D2D);
+    }
+    body.dark .results-title {
+      color: var(--text-primary-dark, #FCFAFA);
+    }
+    .score-breakdown {
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .score-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      background-color: rgba(255, 127, 127, 0.1);
+      border-radius: 0.5rem;
+    }
+    body.dark .score-item {
+      background-color: rgba(126, 249, 208, 0.1);
+    }
+    .share-button {
+      margin-top: 1.5rem;
+    }
+    .confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="results-container">
+      <h1 class="results-title" id="resultsTitle">Félicitations ! 🎉</h1>
+      <div id="resultsContent">
+        <!-- Contenu chargé dynamiquement -->
+      </div>
+      <div class="score-breakdown" id="scoreBreakdown"></div>
+      <a href="Acceuil.html" class="btn-primary">Retour à l'accueil</a>
+      <button id="shareButton" class="btn-primary share-button">Partager mon score 📤</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="../js/firebase-config.js"></script>
+  <script type="module" src="../js/share.js"></script>
+  <script type="module">
+    // Récupérer les paramètres de l'URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const score = parseInt(urlParams.get('score')) || 0;
+    const total = parseInt(urlParams.get('total')) || 10;
+    const theme = urlParams.get('theme') || "Tous";
+    const difficulty = urlParams.get('difficulty') || "Moyenne";
+
+    // Calculer le pourcentage
+    const maxScore = total * (difficulty === "Facile" ? 30 : difficulty === "Moyenne" ? 50 : 100);
+    const percentage = Math.round((score / maxScore) * 100);
+
+    // Mettre à jour le titre
+    const resultsTitle = document.getElementById('resultsTitle');
+    if (percentage >= 80) {
+      resultsTitle.textContent = "Incroyable ! 🏆";
+    } else if (percentage >= 60) {
+      resultsTitle.textContent = "Bien joué ! 👍";
+    } else if (percentage >= 40) {
+      resultsTitle.textContent = "Pas mal ! 😊";
+    } else {
+      resultsTitle.textContent = "À améliorer ! 💪";
+    }
+
+    // Mettre à jour le contenu
+    document.getElementById('resultsContent').innerHTML = `
+      <p>Tu as marqué <strong>${score} points</strong> sur <strong>${maxScore} possibles</strong> !</p>
+      <p>Thème : <strong>${theme}</strong> | Difficulté : <strong>${difficulty}</strong></p>
+      <p>Précision : <strong>${percentage}%</strong></p>
+    `;
+
+    // Ajouter le détail des points par difficulté
+    const scoreBreakdown = document.getElementById('scoreBreakdown');
+    scoreBreakdown.innerHTML = `
+      <div class="score-item">
+        <span>Points par bonne réponse (${difficulty})</span>
+        <span>${difficulty === "Facile" ? "30 pts" : difficulty === "Moyenne" ? "50 pts" : "100 pts"}</span>
+      </div>
+      <div class="score-item">
+        <span>Nombre de questions</span>
+        <span>${total}</span>
+      </div>
+      <div class="score-item">
+        <span>Score maximum possible</span>
+        <span>${maxScore} pts</span>
+      </div>
+    `;
+
+    // Bouton de partage
+    document.getElementById('shareButton').addEventListener('click', () => {
+      shareScore(score, total, theme, difficulty);
+    });
+
+    // Sauvegarder le score dans Firebase (si connecté)
+    import { auth, db } from './firebase-config.js';
+    import { addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const saveScore = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          await addDoc(collection(db, "scores"), {
+            playerName: user.email.split('@')[0],
+            score: score,
+            total: total,
+            theme: theme,
+            difficulty: difficulty,
+            percentage: percentage,
+            timestamp: serverTimestamp()
+          });
+          console.log("Score sauvegardé !");
+        } catch (error) {
+          console.error("Erreur : ", error);
+        }
+      }
+    };
+
+    saveScore();
+  </script>
+</body>
+</html>
